@@ -22,9 +22,9 @@ fetch("http://localhost:4567/rosters/2013-08-15/2013-09-15").then((response) => 
 
 
       tableContents += "<tr><th scope='row'>" + moment(tableData[i].date).format("MMMM Do YYYY") + "</th>" +
-        "<td>" + tableData[i].start.split(" ")[1] + "</td>" +
+        "<td>" + moment.utc(tableData[i].start).format("h:mma") + "</td>" +
         "<td>" + "" + "</td>" +
-        "<td>" + tableData[i].finish.split(" ")[1] + "</td>" +
+        "<td>" + moment.utc(tableData[i].finish).format("h:mma") + "</td>" +
         "<td>" + "" + "</td>" +
         "</tr>";
     }
