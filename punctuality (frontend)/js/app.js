@@ -45,11 +45,33 @@ fetch("http://localhost:4567/rosters/2013-08-15/2013-09-15")
             }
           }
           tableBody.innerHTML = tableContents;
+        } else if (shiftData.length <= rosterData.length) {
+            let s = 0;
+            let r = 0;
+            while (s < shiftData.length && r < rosterData.length) {
+              if (shiftData[s].date === rosterData[r].date) {
+                tableContents += "<tr><th scope='row'>" + shiftData[s].date + "</th>" +
+                  "<td>" + moment.utc(rosterData[r].start).format("h:mma") + "</td>" +
+                  "<td>" + moment.utc(shiftData[s].start).format("h:mma") + "</td>" +
+                  "<td>" + moment.utc(rosterData[r].finish).format("h:mma") + "</td>" +
+                  "<td>" + moment.utc(shiftData[s].finish).format("h:mma") + "</td>" +
+                  "</tr>";
+                s += 1;
+                r += 1;
+              } else {
+                tableContents += "<tr><th scope='row'>" + rosterData[r].date + "</th>" +
+                  "<td>" + moment.utc(rosterData[r].start).format("h:mma") + "</td>" +
+                  "<td>" + "" + "</td>" +
+                  "<td>" + moment.utc(rosterData[r].finish).format("h:mma") + "</td>" +
+                  "<td>" + "" + "</td>" +
+                  "</tr>";
+                r += 1;
+              }
+            }
+            tableBody.innerHTML = tableContents;
         }
        })
       .catch((error) => { console.log("Request failed", error) });
-
-
 
 
 //  (tableData) =>
