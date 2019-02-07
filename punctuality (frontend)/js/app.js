@@ -15,7 +15,13 @@ fetch("http://localhost:4567/rosters/2013-08-15/2013-09-15").then((response) => 
   { tableData = JSON.parse(object);
     console.log(tableData);
     for (let i = 0; i < tableData.length; i++) {
-      tableContents += "<tr><th scope='row'>" + tableData[i].date + "</th>" +
+      // let dateString = tableData[i].date.split("-");
+      // let year = dateString[0];
+      // let month = dateString[1];
+      // let day = dateString[2];
+
+
+      tableContents += "<tr><th scope='row'>" + moment(tableData[i].date).format("MMMM Do YYYY") + "</th>" +
         "<td>" + tableData[i].start.split(" ")[1] + "</td>" +
         "<td>" + "" + "</td>" +
         "<td>" + tableData[i].finish.split(" ")[1] + "</td>" +
