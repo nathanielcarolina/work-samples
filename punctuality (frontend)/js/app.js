@@ -26,7 +26,7 @@ fetch("http://localhost:4567/rosters/2013-08-15/2013-09-15")
           let r = 0;
           while (s < shiftData.length && r < rosterData.length) {
             if (shiftData[s].date === rosterData[r].date) {
-              tableContents += "<tr><th scope='row'>" + shiftData[s].date + "</th>" +
+              tableContents += "<tr><th scope='row'>" + moment(shiftData[s].date).format("MMMM Do YYYY") + "</th>" +
                 "<td>" + moment.utc(rosterData[r].start).format("h:mma") + "</td>" +
                 "<td>" + moment.utc(shiftData[s].start).format("h:mma") + "</td>" +
                 "<td>" + moment.utc(rosterData[r].finish).format("h:mma") + "</td>" +
@@ -35,7 +35,7 @@ fetch("http://localhost:4567/rosters/2013-08-15/2013-09-15")
               s += 1;
               r += 1;
             } else {
-              tableContents += "<tr><th scope='row'>" + shiftData[s].date + "</th>" +
+              tableContents += "<tr><th scope='row'>" + moment(shiftData[s].date).format("MMMM Do YYYY") + "</th>" +
                 "<td>" + "" + "</td>" +
                 "<td>" + moment.utc(shiftData[s].start).format("h:mma") + "</td>" +
                 "<td>" + "" + "</td>" +
@@ -50,7 +50,7 @@ fetch("http://localhost:4567/rosters/2013-08-15/2013-09-15")
             let r = 0;
             while (s < shiftData.length && r < rosterData.length) {
               if (shiftData[s].date === rosterData[r].date) {
-                tableContents += "<tr><th scope='row'>" + shiftData[s].date + "</th>" +
+                tableContents += "<tr><th scope='row'>" + moment(shiftData[s].date).format("MMMM Do YYYY") + "</th>" +
                   "<td>" + moment.utc(rosterData[r].start).format("h:mma") + "</td>" +
                   "<td>" + moment.utc(shiftData[s].start).format("h:mma") + "</td>" +
                   "<td>" + moment.utc(rosterData[r].finish).format("h:mma") + "</td>" +
@@ -59,7 +59,7 @@ fetch("http://localhost:4567/rosters/2013-08-15/2013-09-15")
                 s += 1;
                 r += 1;
               } else {
-                tableContents += "<tr><th scope='row'>" + rosterData[r].date + "</th>" +
+                tableContents += "<tr><th scope='row'>" + moment(rosterData[r].date).format("MMMM Do YYYY") + "</th>" +
                   "<td>" + moment.utc(rosterData[r].start).format("h:mma") + "</td>" +
                   "<td>" + "" + "</td>" +
                   "<td>" + moment.utc(rosterData[r].finish).format("h:mma") + "</td>" +
