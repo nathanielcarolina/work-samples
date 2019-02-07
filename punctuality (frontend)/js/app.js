@@ -27,19 +27,20 @@ fetch("http://localhost:4567/rosters/2013-08-15/2013-09-15")
             if (shiftData[s].date === rosterData[r].date) {
               let startDiff = moment.utc(shiftData[s].start).diff(moment.utc(rosterData[r].start));
               let startDiffMin = Math.floor(startDiff/1000/60);
-              let hiddenClass = startDiffMin <= 0 ? " hidden" : "";
+              let hiddenClassStart = startDiffMin <= 0 ? " hidden" : "";
               let startRemarks = startDiff <= 0 ? "on time" : "late";
+              let finishDiff = moment.utc(rosterData[r].finish).diff(moment.utc(shiftData[s].finish));
+              let finishDiffMin = Math.floor(finishDiff/1000/60);
+              let hiddenClassFinish = finishDiffMin <= 0 ? " hidden" : "";
+              let finishRemarks = finishDiff <= 0 ? "on time" : "left early";
               tableContents += "<tr><th scope='row'>" + moment(shiftData[s].date).format("MMMM Do YYYY") + "</th>" +
                 "<td>" + moment.utc(rosterData[r].start).format("h:mma") + "</td>" +
-                "<td><span data-toggle='tooltip' data-placement='top' title='" + moment.utc(shiftData[s].start).format("h:mma") + "'>" + startRemarks + " <span class='badge badge-danger" + hiddenClass + "'>" + startDiffMin + " minutes</span></span></td>" +
+                "<td><span data-toggle='tooltip' data-placement='top' title='" + moment.utc(shiftData[s].start).format("h:mma") + "'>" + startRemarks + " <span class='badge badge-danger" + hiddenClassStart + "'>" + startDiffMin + " minutes</span></span></td>" +
                 "<td>" + moment.utc(rosterData[r].finish).format("h:mma") + "</td>" +
-                "<td>" + moment.utc(shiftData[s].finish).format("h:mma") + "</td>" +
+                "<td><span data-toggle='tooltip' data-placement='top' title='" + moment.utc(shiftData[s].finish).format("h:mma") + "'>" + finishRemarks + " <span class='badge badge-danger" + hiddenClassFinish + "'>" + finishDiffMin + " minutes</span></span></td>" +
                 "</tr>";
               s += 1;
               r += 1;
-              $(function () {
-                $("[data-toggle='tooltip']").tooltip()
-              });
 
             } else {
               tableContents += "<tr><th scope='row'>" + moment(shiftData[s].date).format("MMMM Do YYYY") + "</th>" +
@@ -52,16 +53,28 @@ fetch("http://localhost:4567/rosters/2013-08-15/2013-09-15")
             }
           }
           tableBody.innerHTML = tableContents;
+          $(function () {
+            $("[data-toggle='tooltip']").tooltip()
+          });
+
         } else if (shiftData.length <= rosterData.length) {
             let s = 0;
             let r = 0;
             while (s < shiftData.length && r < rosterData.length) {
               if (shiftData[s].date === rosterData[r].date) {
+                let startDiff = moment.utc(shiftData[s].start).diff(moment.utc(rosterData[r].start));
+                let startDiffMin = Math.floor(startDiff/1000/60);
+                let hiddenClassStart = startDiffMin <= 0 ? " hidden" : "";
+                let startRemarks = startDiff <= 0 ? "on time" : "late";
+                let finishDiff = moment.utc(rosterData[r].finish).diff(moment.utc(shiftData[s].finish));
+                let finishDiffMin = Math.floor(finishDiff/1000/60);
+                let hiddenClassFinish = finishDiffMin <= 0 ? " hidden" : "";
+                let finishRemarks = finishDiff <= 0 ? "on time" : "left early";
                 tableContents += "<tr><th scope='row'>" + moment(shiftData[s].date).format("MMMM Do YYYY") + "</th>" +
                   "<td>" + moment.utc(rosterData[r].start).format("h:mma") + "</td>" +
-                  "<td>" + moment.utc(shiftData[s].start).format("h:mma") + "</td>" +
+                  "<td><span data-toggle='tooltip' data-placement='top' title='" + moment.utc(shiftData[s].start).format("h:mma") + "'>" + startRemarks + " <span class='badge badge-danger" + hiddenClassStart + "'>" + startDiffMin + " minutes</span></span></td>" +
                   "<td>" + moment.utc(rosterData[r].finish).format("h:mma") + "</td>" +
-                  "<td>" + moment.utc(shiftData[s].finish).format("h:mma") + "</td>" +
+                  "<td><span data-toggle='tooltip' data-placement='top' title='" + moment.utc(shiftData[s].finish).format("h:mma") + "'>" + finishRemarks + " <span class='badge badge-danger" + hiddenClassFinish + "'>" + finishDiffMin + " minutes</span></span></td>" +
                   "</tr>";
                 s += 1;
                 r += 1;
@@ -76,6 +89,9 @@ fetch("http://localhost:4567/rosters/2013-08-15/2013-09-15")
               }
             }
             tableBody.innerHTML = tableContents;
+            $(function () {
+              $("[data-toggle='tooltip']").tooltip()
+            });
         }
       })
 //      .catch((error) => { console.log("Request failed", error) });
