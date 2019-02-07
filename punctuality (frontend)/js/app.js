@@ -16,11 +16,11 @@ fetch("http://localhost:4567/rosters/2013-08-15/2013-09-15").then((response) => 
     console.log(tableData);
     for (let i = 0; i < tableData.length; i++) {
       tableContents += "<tr><th scope='row'>" + tableData[i].date + "</th>" +
-        "<td>" + tableData[i].start + "</td>" +
+        "<td>" + tableData[i].start.split(" ")[1] + "</td>" +
         "<td>" + "" + "</td>" +
-        "<td>" + tableData[i].finish + "</td>" +
+        "<td>" + tableData[i].finish.split(" ")[1] + "</td>" +
         "<td>" + "" + "</td>" +
-        "</tr>"
+        "</tr>";
     }
     tableBody.innerHTML = tableContents;
 
