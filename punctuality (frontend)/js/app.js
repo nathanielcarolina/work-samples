@@ -1,14 +1,45 @@
-let tableDay = document.getElementById("table-day");
 let tableBody = document.getElementById("table-body");
-let tableData, rosterData, shiftData;
-let shiftDataContents = "";
+let rosterData, shiftData;
 let tableContents = "";
-let dates;
-let starts;
-let actualStarts;
-let finishes;
-let actualFinishes;
+let startDiff, startDiffMin, hiddenClassStart, startRemarks, finishDiff, finishDiffMin, hiddenClassFinish, finishRemarks;
 
+function initializeVars(s, r) {
+  startDiff = moment.utc(shiftData[s].start).diff(moment.utc(rosterData[r].start));
+  startDiffMin = Math.floor(startDiff/1000/60);
+  hiddenClassStart = startDiffMin > 0 ? "" : " hidden";
+  startRemarks = (startDiff <= 0) ? "on time" : (startDiff > 0 ? "late" : "no time clocked");
+  finishDiff = moment.utc(rosterData[r].finish).diff(moment.utc(shiftData[s].finish));
+  finishDiffMin = Math.floor(finishDiff/1000/60);
+  hiddenClassFinish = finishDiffMin > 0 ? "" : " hidden";
+  finishRemarks = (finishDiff <= 0) ? "on time" : (finishDiff > 0 ? "left early" : "no time clocked");
+}
+
+function setTableContents(s, r) {
+  tableContents += "<tr><th scope='row'>" + moment(shiftData[s].date).format("MMMM Do YYYY") + "</th>" +
+    "<td>" + moment.utc(rosterData[r].start).format("h:mma") + "</td>" +
+    "<td><span data-toggle='tooltip' data-placement='top' title='" + moment.utc(shiftData[s].start).format("h:mma") + "'>" + startRemarks + " <span class='badge badge-danger" + hiddenClassStart + "'>" + startDiffMin + " minutes</span></span></td>" +
+    "<td>" + moment.utc(rosterData[r].finish).format("h:mma") + "</td>" +
+    "<td><span data-toggle='tooltip' data-placement='top' title='" + moment.utc(shiftData[s].finish).format("h:mma") + "'>" + finishRemarks + " <span class='badge badge-danger" + hiddenClassFinish + "'>" + finishDiffMin + " minutes</span></span></td>" +
+    "</tr>";
+}
+
+function setTableContentsShift(s, r) {
+  tableContents += "<tr><th scope='row'>" + moment(shiftData[s].date).format("MMMM Do YYYY") + "</th>" +
+    "<td>" + "" + "</td>" +
+    "<td>" + moment.utc(shiftData[s].start).format("h:mma") + "</td>" +
+    "<td>" + "" + "</td>" +
+    "<td>" + moment.utc(shiftData[s].finish).format("h:mma") + "</td>" +
+    "</tr>";
+}
+
+function setTableContentsRoster(s, r) {
+  tableContents += "<tr><th scope='row'>" + moment(rosterData[r].date).format("MMMM Do YYYY") + "</th>" +
+    "<td>" + moment.utc(rosterData[r].start).format("h:mma") + "</td>" +
+    "<td>" + "" + "</td>" +
+    "<td>" + moment.utc(rosterData[r].finish).format("h:mma") + "</td>" +
+    "<td>" + "" + "</td>" +
+    "</tr>";
+}
 
 
 
@@ -16,83 +47,49 @@ fetch("http://localhost:4567/rosters/2013-08-15/2013-09-15")
   .then((response) => { return response.json(); })
   .then((data) => {
     rosterData = data;
+
     return fetch("http://localhost:4567/shifts/2013-08-15/2013-09-15") })
       .then((response) => { return response.json(); })
       .then((data) => {
         shiftData = data;
+        let s = 0;
+        let r = 0;
+
         if (shiftData.length > rosterData.length) {
-          let s = 0;
-          let r = 0;
           while (s < shiftData.length && r < rosterData.length) {
             if (shiftData[s].date === rosterData[r].date) {
-              let startDiff = moment.utc(shiftData[s].start).diff(moment.utc(rosterData[r].start));
-              let startDiffMin = Math.floor(startDiff/1000/60);
-              let hiddenClassStart = startDiffMin > 0 ? "" : " hidden";
-              let startRemarks = (startDiff <= 0) ? "on time" : (startDiff > 0 ? "late" : "no time clocked");
-              let finishDiff = moment.utc(rosterData[r].finish).diff(moment.utc(shiftData[s].finish));
-              let finishDiffMin = Math.floor(finishDiff/1000/60);
-              let hiddenClassFinish = finishDiffMin > 0 ? "" : " hidden";
-              let finishRemarks = (finishDiff <= 0) ? "on time" : (finishDiff > 0 ? "left early" : "no time clocked");
-              tableContents += "<tr><th scope='row'>" + moment(shiftData[s].date).format("MMMM Do YYYY") + "</th>" +
-                "<td>" + moment.utc(rosterData[r].start).format("h:mma") + "</td>" +
-                "<td><span data-toggle='tooltip' data-placement='top' title='" + moment.utc(shiftData[s].start).format("h:mma") + "'>" + startRemarks + " <span class='badge badge-danger" + hiddenClassStart + "'>" + startDiffMin + " minutes</span></span></td>" +
-                "<td>" + moment.utc(rosterData[r].finish).format("h:mma") + "</td>" +
-                "<td><span data-toggle='tooltip' data-placement='top' title='" + moment.utc(shiftData[s].finish).format("h:mma") + "'>" + finishRemarks + " <span class='badge badge-danger" + hiddenClassFinish + "'>" + finishDiffMin + " minutes</span></span></td>" +
-                "</tr>";
+              initializeVars(s, r);
+              setTableContents(s, r);
               s += 1;
               r += 1;
 
             } else {
-              tableContents += "<tr><th scope='row'>" + moment(shiftData[s].date).format("MMMM Do YYYY") + "</th>" +
-                "<td>" + "" + "</td>" +
-                "<td>" + moment.utc(shiftData[s].start).format("h:mma") + "</td>" +
-                "<td>" + "" + "</td>" +
-                "<td>" + moment.utc(shiftData[s].finish).format("h:mma") + "</td>" +
-                "</tr>";
+              setTableContentsShift(s, r);
               s += 1;
             }
           }
-          tableBody.innerHTML = tableContents;
-          $(function () {
-            $("[data-toggle='tooltip']").tooltip()
-          });
 
         } else if (shiftData.length <= rosterData.length) {
-            let s = 0;
-            let r = 0;
-            while (s < shiftData.length && r < rosterData.length) {
-              if (shiftData[s].date === rosterData[r].date) {
-                let startDiff = moment.utc(shiftData[s].start).diff(moment.utc(rosterData[r].start));
-                let startDiffMin = Math.floor(startDiff/1000/60);
-                let hiddenClassStart = startDiffMin > 0 ? "" : " hidden";
-                let startRemarks = (startDiff <= 0) ? "on time" : (startDiff > 0 ? "late" : "no time clocked");
-                let finishDiff = moment.utc(rosterData[r].finish).diff(moment.utc(shiftData[s].finish));
-                let finishDiffMin = Math.floor(finishDiff/1000/60);
-                let hiddenClassFinish = finishDiffMin > 0 ? "" : " hidden";
-                let finishRemarks = (finishDiff <= 0) ? "on time" : (finishDiff > 0 ? "left early" : "no time clocked");
-                tableContents += "<tr><th scope='row'>" + moment(shiftData[s].date).format("MMMM Do YYYY") + "</th>" +
-                  "<td>" + moment.utc(rosterData[r].start).format("h:mma") + "</td>" +
-                  "<td><span data-toggle='tooltip' data-placement='top' title='" + moment.utc(shiftData[s].start).format("h:mma") + "'>" + startRemarks + " <span class='badge badge-danger" + hiddenClassStart + "'>" + startDiffMin + " minutes</span></span></td>" +
-                  "<td>" + moment.utc(rosterData[r].finish).format("h:mma") + "</td>" +
-                  "<td><span data-toggle='tooltip' data-placement='top' title='" + moment.utc(shiftData[s].finish).format("h:mma") + "'>" + finishRemarks + " <span class='badge badge-danger" + hiddenClassFinish + "'>" + finishDiffMin + " minutes</span></span></td>" +
-                  "</tr>";
-                s += 1;
-                r += 1;
-              } else {
-                tableContents += "<tr><th scope='row'>" + moment(rosterData[r].date).format("MMMM Do YYYY") + "</th>" +
-                  "<td>" + moment.utc(rosterData[r].start).format("h:mma") + "</td>" +
-                  "<td>" + "" + "</td>" +
-                  "<td>" + moment.utc(rosterData[r].finish).format("h:mma") + "</td>" +
-                  "<td>" + "" + "</td>" +
-                  "</tr>";
-                r += 1;
-              }
+          while (s < shiftData.length && r < rosterData.length) {
+            if (shiftData[s].date === rosterData[r].date) {
+              initializeVars(s, r);
+              setTableContents(s, r);
+              s += 1;
+              r += 1;
+
+            } else {
+              setTableContentsRoster(s, r);
+              r += 1;
             }
-            tableBody.innerHTML = tableContents;
-            $(function () {
-              $("[data-toggle='tooltip']").tooltip()
-            });
+          }
         }
+
+        tableBody.innerHTML = tableContents;
+
+        // Initialize all tooltips
+        $(function () {
+          $("[data-toggle='tooltip']").tooltip()
+        });
       })
 //      .catch((error) => { console.log("Request failed", error) });
 
