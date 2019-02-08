@@ -9,11 +9,11 @@ function initializeVars(s, r) {
   startDiff = moment.utc(shiftData[s].start).diff(moment.utc(rosterData[r].start));
   startDiffMin = Math.floor(startDiff/1000/60);
   hiddenClassStart = startDiffMin > 0 ? "" : " hidden";
-  startRemarks = (startDiff <= 0) ? "on time" : (startDiff > 0 ? "late" : "<span class='badge badge-warning'>no time clocked</span>");
+  startRemarks = (startDiff <= 0) ? "<span class='text-success'>on time</span>" : (startDiff > 0 ? "<span class='text-danger'>late</span>" : "<span class='badge badge-warning'>no time clocked</span>");
   finishDiff = moment.utc(rosterData[r].finish).diff(moment.utc(shiftData[s].finish));
   finishDiffMin = Math.floor(finishDiff/1000/60);
   hiddenClassFinish = finishDiffMin > 0 ? "" : " hidden";
-  finishRemarks = (finishDiff <= 0) ? "on time" : (finishDiff > 0 ? "left early" : "<span class='badge badge-warning'>no time clocked</span>");
+  finishRemarks = (finishDiff <= 0) ? "<span class='text-success'>on time</span>" : (finishDiff > 0 ? "<span class='text-danger'>left early</span>" : "<span class='badge badge-warning'>no time clocked</span>");
 }
 
 function setTableContents(s, r) {
@@ -28,17 +28,17 @@ function setTableContents(s, r) {
 function setTableContentsShift(s, r) {
   tableContents += "<tr><th scope='row'>" + moment(shiftData[s].date).format("MMMM Do YYYY") + "</th>" +
     "<td><span class='badge badge-warning'>no data</span></td>" +
-    "<td>" + moment.utc(shiftData[s].start).format("h:mma") + "</td>" +
+    "<td><span class='text-muted'>" + moment.utc(shiftData[s].start).format("h:mma") + "</span></td>" +
     "<td><span class='badge badge-warning'>no data</span></td>" +
-    "<td>" + moment.utc(shiftData[s].finish).format("h:mma") + "</td>" +
+    "<td><span class='text-muted'>" + moment.utc(shiftData[s].finish).format("h:mma") + "</span></td>" +
     "</tr>";
 }
 
 function setTableContentsRoster(s, r) {
   tableContents += "<tr><th scope='row'>" + moment(rosterData[r].date).format("MMMM Do YYYY") + "</th>" +
-    "<td>" + moment.utc(rosterData[r].start).format("h:mma") + "</td>" +
+    "<td><span class='text-muted'>" + moment.utc(rosterData[r].start).format("h:mma") + "</span></td>" +
     "<td><span class='badge badge-warning'>no data</span></td>" +
-    "<td>" + moment.utc(rosterData[r].finish).format("h:mma") + "</td>" +
+    "<td><span class='text-muted'>" + moment.utc(rosterData[r].finish).format("h:mma") + "</span></td>" +
     "<td><span class='badge badge-warning'>no data</span></td>" +
     "</tr>";
 }
