@@ -27,12 +27,12 @@ fetch("http://localhost:4567/rosters/2013-08-15/2013-09-15")
             if (shiftData[s].date === rosterData[r].date) {
               let startDiff = moment.utc(shiftData[s].start).diff(moment.utc(rosterData[r].start));
               let startDiffMin = Math.floor(startDiff/1000/60);
-              let hiddenClassStart = startDiffMin <= 0 ? " hidden" : "";
-              let startRemarks = startDiff <= 0 ? "on time" : "late";
+              let hiddenClassStart = startDiffMin > 0 ? "" : " hidden";
+              let startRemarks = (startDiff <= 0) ? "on time" : (startDiff > 0 ? "late" : "no time clocked");
               let finishDiff = moment.utc(rosterData[r].finish).diff(moment.utc(shiftData[s].finish));
               let finishDiffMin = Math.floor(finishDiff/1000/60);
-              let hiddenClassFinish = finishDiffMin <= 0 ? " hidden" : "";
-              let finishRemarks = finishDiff <= 0 ? "on time" : "left early";
+              let hiddenClassFinish = finishDiffMin > 0 ? "" : " hidden";
+              let finishRemarks = (finishDiff <= 0) ? "on time" : (finishDiff > 0 ? "left early" : "no time clocked");
               tableContents += "<tr><th scope='row'>" + moment(shiftData[s].date).format("MMMM Do YYYY") + "</th>" +
                 "<td>" + moment.utc(rosterData[r].start).format("h:mma") + "</td>" +
                 "<td><span data-toggle='tooltip' data-placement='top' title='" + moment.utc(shiftData[s].start).format("h:mma") + "'>" + startRemarks + " <span class='badge badge-danger" + hiddenClassStart + "'>" + startDiffMin + " minutes</span></span></td>" +
@@ -64,12 +64,12 @@ fetch("http://localhost:4567/rosters/2013-08-15/2013-09-15")
               if (shiftData[s].date === rosterData[r].date) {
                 let startDiff = moment.utc(shiftData[s].start).diff(moment.utc(rosterData[r].start));
                 let startDiffMin = Math.floor(startDiff/1000/60);
-                let hiddenClassStart = startDiffMin <= 0 ? " hidden" : "";
-                let startRemarks = startDiff <= 0 ? "on time" : "late";
+                let hiddenClassStart = startDiffMin > 0 ? "" : " hidden";
+                let startRemarks = (startDiff <= 0) ? "on time" : (startDiff > 0 ? "late" : "no time clocked");
                 let finishDiff = moment.utc(rosterData[r].finish).diff(moment.utc(shiftData[s].finish));
                 let finishDiffMin = Math.floor(finishDiff/1000/60);
-                let hiddenClassFinish = finishDiffMin <= 0 ? " hidden" : "";
-                let finishRemarks = finishDiff <= 0 ? "on time" : "left early";
+                let hiddenClassFinish = finishDiffMin > 0 ? "" : " hidden";
+                let finishRemarks = (finishDiff <= 0) ? "on time" : (finishDiff > 0 ? "left early" : "no time clocked");
                 tableContents += "<tr><th scope='row'>" + moment(shiftData[s].date).format("MMMM Do YYYY") + "</th>" +
                   "<td>" + moment.utc(rosterData[r].start).format("h:mma") + "</td>" +
                   "<td><span data-toggle='tooltip' data-placement='top' title='" + moment.utc(shiftData[s].start).format("h:mma") + "'>" + startRemarks + " <span class='badge badge-danger" + hiddenClassStart + "'>" + startDiffMin + " minutes</span></span></td>" +
