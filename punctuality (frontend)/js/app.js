@@ -49,50 +49,53 @@ fetch("http://localhost:4567/rosters/2013-08-15/2013-09-15")
     rosterData = data;
 
     return fetch("http://localhost:4567/shifts/2013-08-15/2013-09-15") })
-      .then((response) => { return response.json(); })
-      .then((data) => {
-        shiftData = data;
-        let s = 0;
-        let r = 0;
+  .then((response) => { return response.json(); })
+  .then((data) => {
+    shiftData = data;
+    let s = 0;
+    let r = 0;
 
-        if (shiftData.length > rosterData.length) {
-          while (s < shiftData.length && r < rosterData.length) {
-            if (shiftData[s].date === rosterData[r].date) {
-              initializeVars(s, r);
-              setTableContents(s, r);
-              s += 1;
-              r += 1;
+    if (shiftData.length > rosterData.length) {
+      while (s < shiftData.length && r < rosterData.length) {
+        if (shiftData[s].date === rosterData[r].date) {
+          initializeVars(s, r);
+          setTableContents(s, r);
+          s += 1;
+          r += 1;
 
-            } else {
-              setTableContentsShift(s, r);
-              s += 1;
-            }
-          }
-
-        } else if (shiftData.length <= rosterData.length) {
-          while (s < shiftData.length && r < rosterData.length) {
-            if (shiftData[s].date === rosterData[r].date) {
-              initializeVars(s, r);
-              setTableContents(s, r);
-              s += 1;
-              r += 1;
-
-            } else {
-              setTableContentsRoster(s, r);
-              r += 1;
-            }
-          }
+        } else {
+          setTableContentsShift(s, r);
+          s += 1;
         }
+      }
 
-        tableBody.innerHTML = tableContents;
+    } else if (shiftData.length <= rosterData.length) {
+      while (s < shiftData.length && r < rosterData.length) {
+        if (shiftData[s].date === rosterData[r].date) {
+          initializeVars(s, r);
+          setTableContents(s, r);
+          s += 1;
+          r += 1;
 
-        // Initialize all tooltips
-        $(function () {
-          $("[data-toggle='tooltip']").tooltip()
-        });
-      })
+        } else {
+          setTableContentsRoster(s, r);
+          r += 1;
+        }
+      }
+    }
+
+    tableBody.innerHTML = tableContents;
+
+    // Initialize all tooltips
+    $(function () {
+      $("[data-toggle='tooltip']").tooltip()
+    });
+  })
+  .catch((error) => { tableBody.innerHTML = "Request failed. Please check your internet connection.<br>" + error; });
+
+//  })
+//  .catch((error) => { console.log("Request failed", error) });
 //      .catch((error) => { console.log("Request failed", error) });
-
 
 
 
