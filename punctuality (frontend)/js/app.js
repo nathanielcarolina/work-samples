@@ -3,6 +3,8 @@ let rosterData, shiftData;
 let tableContents = "";
 let startDiff, startDiffMin, hiddenClassStart, startRemarks, finishDiff, finishDiffMin, hiddenClassFinish, finishRemarks;
 
+
+// Functions
 function initializeVars(s, r) {
   startDiff = moment.utc(shiftData[s].start).diff(moment.utc(rosterData[r].start));
   startDiffMin = Math.floor(startDiff/1000/60);
@@ -42,12 +44,13 @@ function setTableContentsRoster(s, r) {
 }
 
 
-
+// Fetch roster data from the server
 fetch("http://localhost:4567/rosters/2013-08-15/2013-09-15")
   .then((response) => { return response.json(); })
   .then((data) => {
     rosterData = data;
 
+    // Fetch shift data from the server
     return fetch("http://localhost:4567/shifts/2013-08-15/2013-09-15") })
   .then((response) => { return response.json(); })
   .then((data) => {
@@ -55,6 +58,7 @@ fetch("http://localhost:4567/rosters/2013-08-15/2013-09-15")
     let s = 0;
     let r = 0;
 
+    // Handling of shifts/rosters with some times missing
     if (shiftData.length > rosterData.length) {
       while (s < shiftData.length && r < rosterData.length) {
         if (shiftData[s].date === rosterData[r].date) {
@@ -64,6 +68,7 @@ fetch("http://localhost:4567/rosters/2013-08-15/2013-09-15")
           r += 1;
 
         } else {
+          // Populate only shift data if there are no roster data
           setTableContentsShift(s, r);
           s += 1;
         }
@@ -78,6 +83,7 @@ fetch("http://localhost:4567/rosters/2013-08-15/2013-09-15")
           r += 1;
 
         } else {
+          // Populate only roster data if there are no shift data
           setTableContentsRoster(s, r);
           r += 1;
         }
@@ -92,64 +98,3 @@ fetch("http://localhost:4567/rosters/2013-08-15/2013-09-15")
     });
   })
   .catch((error) => { tableBody.innerHTML = "Request failed. Please check your internet connection.<br>" + error; });
-
-//  })
-//  .catch((error) => { console.log("Request failed", error) });
-//      .catch((error) => { console.log("Request failed", error) });
-
-
-
-
-//  (tableData) =>
-  // {
-  //
-  //
-  //
-  //   //tableData = JSON.parse(object);
-  //   console.log(tableData);
-  //   for (let i = 0; i < tableData.length; i++) {
-  //     // let dateString = tableData[i].date.split("-");
-  //     // let year = dateString[0];
-  //     // let month = dateString[1];
-  //     // let day = dateString[2];
-  //
-  //
-  //     tableContents += "<tr><th scope='row'>" + moment(tableData[i].date).format("MMMM Do YYYY") + "</th>" +
-  //       "<td>" + moment.utc(tableData[i].start).format("h:mma") + "</td>" +
-  //       "<td>" + "" + "</td>" +
-  //       "<td>" + moment.utc(tableData[i].finish).format("h:mma") + "</td>" +
-  //       "<td>" + "" + "</td>" +
-  //       "</tr>";
-  //   }
-  //   tableBody.innerHTML = tableContents;
-  //
-  //   // dates = tableData.map(i => i.date);
-  //   // starts = tableData.map(i => i.start);
-  //   // console.log(dates);
-  //   // dates.forEach(date => { tableBody.innerHTML +=
-  //   //   "<tr><th scope='row' id='table-day'>" + date + "</th></tr>"
-  //   //   "<td></td>"
-  //   //   ; });
-  // }) }).then(() => {
-  //   fetch("http://localhost:4567/shifts/2013-08-15/2013-09-15").then((response) => { response.json().then((shiftData) =>
-  //     { //shiftData = JSON.parse(object);
-  //       console.log(shiftData);
-  //       for (let j = 0; j < shiftData.length; j++) {
-  //         // let dateString = tableData[i].date.split("-");
-  //         // let year = dateString[0];
-  //         // let month = dateString[1];
-  //         // let day = dateString[2];
-  //         let shiftDate = shiftData[j].date;
-  //         if (shiftDate === )
-  //         console.log(shiftDate);
-  //
-  //         // shiftContents += "<tr><th scope='row'>" + moment(tableData[i].date).format("MMMM Do YYYY") + "</th>" +
-  //         //   "<td>" + moment.utc(tableData[i].start).format("h:mma") + "</td>" +
-  //         //   "<td>" + "" + "</td>" +
-  //         //   "<td>" + moment.utc(tableData[i].finish).format("h:mma") + "</td>" +
-  //         //   "<td>" + "" + "</td>" +
-  //         //   "</tr>";
-  //       }
-  //     }); });
-
-//    });
