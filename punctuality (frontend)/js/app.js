@@ -2,14 +2,6 @@ let tableBody = document.getElementById("table-body");
 let tableContents = "";
 let rosterData, shiftData, startDiff, finishDiff, startDiffMin, finishDiffMin, startRemarks, finishRemarks, hiddenClassStart, hiddenClassFinish, rosterDiff, payableHours;
 
-// HTML Templates
-const ON_TIME = "<span class='text-success'>on time</span>";
-const LATE = "<span class='text-danger'>late</span>";
-const LEFT_EARLY = "<span class='text-danger'>left early</span>";
-const NO_TIME_CLOCKED = "<span class='badge badge-warning'>no time clocked</span>";
-const NO_DATA = "<span class='badge badge-warning'>no data</span>";
-
-
 // Functions
 function initializeVars(s, r) {
   startDiff = moment.utc(shiftData[s].start).diff(moment.utc(rosterData[r].start));
@@ -34,26 +26,6 @@ function resetRosterDiff() {
 function computePayableHours() {
   payableHours = (rosterDiff) ? (rosterDiff - convMinToHr(startDiffMin) - convMinToHr(finishDiffMin)) : 0;
   payableHours = payableHours.toFixed(2);
-}
-
-function th_row(child) {
-  return "<th scope='row'>" + child + "</th>";
-}
-
-function td(child) {
-  return "<td>" + child + "</td>";
-}
-
-function td_muted(child) {
-  return td( "<span class='text-muted'>" + child + "</span>" );
-}
-
-function toolTip(title, child) {
-  return "<span data-toggle='tooltip' data-placement='top' title='" + title + "'>" + child + "</span>"
-}
-
-function badgeDanger(addClass, child) {
-  return " <span class='badge badge-danger" + addClass + "'>" + child + " minutes</span>";
 }
 
 function setTableContents(s, r) {
@@ -99,10 +71,6 @@ function convMinToHr(min) {
   return hr;
 }
 
-function hiddenClass(a) {
-  return a > 0 ? "" : " hidden";
-}
-
 
 // Fetch roster data from the server
 fetch("http://localhost:4567/rosters/2013-08-15/2013-09-15")
@@ -118,51 +86,29 @@ fetch("http://localhost:4567/rosters/2013-08-15/2013-09-15")
     let s = 0;
     let r = 0;
 
-    // Handling of shifts/rosters with some times missing
-    if (shiftData.length > rosterData.length) {
-      while (s < shiftData.length && r < rosterData.length) {
-        if (shiftData[s].date === rosterData[r].date) {
-          resetRosterDiff();
-          initializeVars(s, r);
-          computePayableHours();
-          setTableContents(s, r);
-          s += 1;
-          r += 1;
-
-        } else {
+    while (s < shiftData.length && r < rosterData.length) {
+      if (shiftData[s].date === rosterData[r].date) {
+        initializeVars(s, r);
+        computePayableHours();
+        setTableContents(s, r);
+        s += 1;
+        r += 1;
+      } else {
+        resetRosterDiff();
+        computePayableHours();
+        // Handling of shifts/rosters with some times missing
+        if (shiftData.length > rosterData.length) {
           // Populate only shift data if there are no roster data
-          resetRosterDiff();
-          computePayableHours();
           setTableContentsShift(s, r);
           s += 1;
-        }
-      }
-
-    } else if (shiftData.length <= rosterData.length) {
-      while (s < shiftData.length && r < rosterData.length) {
-        if (shiftData[s].date === rosterData[r].date) {
-          resetRosterDiff();
-          initializeVars(s, r);
-          computePayableHours();
-          setTableContents(s, r);
-          s += 1;
-          r += 1;
-
-        } else {
+        } else if (shiftData.length <= rosterData.length) {
           // Populate only roster data if there are no shift data
-          resetRosterDiff();
-          computePayableHours();
           setTableContentsRoster(s, r);
           r += 1;
         }
       }
     }
-
     tableBody.innerHTML = tableContents;
-
     // Initialize all tooltips
-    $(function () {
-      $("[data-toggle='tooltip']").tooltip()
-    });
-  })
+    $(function () { $("[data-toggle='tooltip']").tooltip() }); })
   .catch((error) => { tableBody.innerHTML = "Request failed. Please check your internet connection.<br>" + error; });
