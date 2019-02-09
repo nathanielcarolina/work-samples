@@ -1,19 +1,29 @@
 let tableBody = document.getElementById("table-body");
 let rosterData, shiftData;
 let tableContents = "";
-let startDiff, startDiffMin, hiddenClassStart, startRemarks, finishDiff, finishDiffMin, hiddenClassFinish, finishRemarks;
+let startDiff, startDiffMin, hiddenClassStart, startRemarks, finishDiff, finishDiffMin, hiddenClassFinish, finishRemarks, rosterDiff, payableHours;
 
 
 // Functions
 function initializeVars(s, r) {
   startDiff = moment.utc(shiftData[s].start).diff(moment.utc(rosterData[r].start));
-  startDiffMin = Math.floor(startDiff/1000/60);
+  startDiffMin = (startDiff > 0) ? Math.floor(startDiff/1000/60) : 0;
   hiddenClassStart = startDiffMin > 0 ? "" : " hidden";
   startRemarks = (startDiff <= 0) ? "<span class='text-success'>on time</span>" : (startDiff > 0 ? "<span class='text-danger'>late</span>" : "<span class='badge badge-warning'>no time clocked</span>");
   finishDiff = moment.utc(rosterData[r].finish).diff(moment.utc(shiftData[s].finish));
-  finishDiffMin = Math.floor(finishDiff/1000/60);
+  finishDiffMin = (finishDiff > 0) ? Math.floor(finishDiff/1000/60) : 0;
   hiddenClassFinish = finishDiffMin > 0 ? "" : " hidden";
   finishRemarks = (finishDiff <= 0) ? "<span class='text-success'>on time</span>" : (finishDiff > 0 ? "<span class='text-danger'>left early</span>" : "<span class='badge badge-warning'>no time clocked</span>");
+  rosterDiff = moment.utc(rosterData[r].finish).diff(moment.utc(rosterData[r].start), "hours", true);
+}
+
+function resetRosterDiff() {
+  rosterDiff = 0;
+}
+
+function computePayableHours() {
+  payableHours = (rosterDiff) ? (rosterDiff - (startDiffMin/60) - (finishDiffMin/60)) : 0;
+  payableHours = payableHours.toFixed(2);
 }
 
 function setTableContents(s, r) {
@@ -22,6 +32,7 @@ function setTableContents(s, r) {
     "<td><span data-toggle='tooltip' data-placement='top' title='" + moment.utc(shiftData[s].start).format("h:mma") + "'>" + startRemarks + " <span class='badge badge-danger" + hiddenClassStart + "'>" + startDiffMin + " minutes</span></span></td>" +
     "<td>" + moment.utc(rosterData[r].finish).format("h:mma") + "</td>" +
     "<td><span data-toggle='tooltip' data-placement='top' title='" + moment.utc(shiftData[s].finish).format("h:mma") + "'>" + finishRemarks + " <span class='badge badge-danger" + hiddenClassFinish + "'>" + finishDiffMin + " minutes</span></span></td>" +
+    "<td>" + payableHours + "</td>" +
     "</tr>";
 }
 
@@ -31,6 +42,7 @@ function setTableContentsShift(s, r) {
     "<td><span class='text-muted'>" + moment.utc(shiftData[s].start).format("h:mma") + "</span></td>" +
     "<td><span class='badge badge-warning'>no data</span></td>" +
     "<td><span class='text-muted'>" + moment.utc(shiftData[s].finish).format("h:mma") + "</span></td>" +
+    "<td>" + payableHours + "</td>" +
     "</tr>";
 }
 
@@ -40,6 +52,7 @@ function setTableContentsRoster(s, r) {
     "<td><span class='badge badge-warning'>no data</span></td>" +
     "<td><span class='text-muted'>" + moment.utc(rosterData[r].finish).format("h:mma") + "</span></td>" +
     "<td><span class='badge badge-warning'>no data</span></td>" +
+    "<td>" + payableHours + "</td>" +
     "</tr>";
 }
 
@@ -62,13 +75,17 @@ fetch("http://localhost:4567/rosters/2013-08-15/2013-09-15")
     if (shiftData.length > rosterData.length) {
       while (s < shiftData.length && r < rosterData.length) {
         if (shiftData[s].date === rosterData[r].date) {
+          resetRosterDiff();
           initializeVars(s, r);
+          computePayableHours();
           setTableContents(s, r);
           s += 1;
           r += 1;
 
         } else {
           // Populate only shift data if there are no roster data
+          resetRosterDiff();
+          computePayableHours();
           setTableContentsShift(s, r);
           s += 1;
         }
@@ -77,13 +94,17 @@ fetch("http://localhost:4567/rosters/2013-08-15/2013-09-15")
     } else if (shiftData.length <= rosterData.length) {
       while (s < shiftData.length && r < rosterData.length) {
         if (shiftData[s].date === rosterData[r].date) {
+          resetRosterDiff();
           initializeVars(s, r);
+          computePayableHours();
           setTableContents(s, r);
           s += 1;
           r += 1;
 
         } else {
           // Populate only roster data if there are no shift data
+          resetRosterDiff();
+          computePayableHours();
           setTableContentsRoster(s, r);
           r += 1;
         }
