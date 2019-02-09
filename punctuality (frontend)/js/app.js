@@ -3,17 +3,27 @@ let rosterData, shiftData;
 let tableContents = "";
 let startDiff, startDiffMin, hiddenClassStart, startRemarks, finishDiff, finishDiffMin, hiddenClassFinish, finishRemarks, rosterDiff, payableHours;
 
+// HTML Templates
+const ONTIME = "<span class='text-success'>on time</span>";
+const LATE = "<span class='text-danger'>late</span>";
+const LEFTEARLY = "<span class='text-danger'>left early</span>";
+const NOTIMECLOCKED = "<span class='badge badge-warning'>no time clocked</span>";
+
 
 // Functions
 function initializeVars(s, r) {
   startDiff = moment.utc(shiftData[s].start).diff(moment.utc(rosterData[r].start));
-  startDiffMin = (startDiff > 0) ? Math.floor(startDiff/1000/60) : 0;
-  hiddenClassStart = startDiffMin > 0 ? "" : " hidden";
-  startRemarks = (startDiff <= 0) ? "<span class='text-success'>on time</span>" : (startDiff > 0 ? "<span class='text-danger'>late</span>" : "<span class='badge badge-warning'>no time clocked</span>");
   finishDiff = moment.utc(rosterData[r].finish).diff(moment.utc(shiftData[s].finish));
-  finishDiffMin = (finishDiff > 0) ? Math.floor(finishDiff/1000/60) : 0;
-  hiddenClassFinish = finishDiffMin > 0 ? "" : " hidden";
-  finishRemarks = (finishDiff <= 0) ? "<span class='text-success'>on time</span>" : (finishDiff > 0 ? "<span class='text-danger'>left early</span>" : "<span class='badge badge-warning'>no time clocked</span>");
+
+  startDiffMin = (startDiff > 0) ? convMsToMin(startDiff) : 0;
+  finishDiffMin = (finishDiff > 0) ? convMsToMin(finishDiff) : 0;
+
+  startRemarks = (startDiff <= 0) ? ONTIME : (startDiff > 0 ? LATE : NOTIMECLOCKED);
+  finishRemarks = (finishDiff <= 0) ? ONTIME : (finishDiff > 0 ? LEFTEARLY : NOTIMECLOCKED);
+
+  hiddenClassStart = hiddenClass(startDiffMin);
+  hiddenClassFinish = hiddenClass(finishDiffMin);
+
   rosterDiff = moment.utc(rosterData[r].finish).diff(moment.utc(rosterData[r].start), "hours", true);
 }
 
@@ -54,6 +64,15 @@ function setTableContentsRoster(s, r) {
     "<td><span class='badge badge-warning'>no data</span></td>" +
     "<td>" + payableHours + "</td>" +
     "</tr>";
+}
+
+function convMsToMin(ms) {
+  let min = Math.floor(ms/1000/60);
+  return min;
+}
+
+function hiddenClass(a) {
+  return a > 0 ? "" : " hidden";
 }
 
 
