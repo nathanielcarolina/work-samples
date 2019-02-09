@@ -1,13 +1,13 @@
 let tableBody = document.getElementById("table-body");
-let rosterData, shiftData;
 let tableContents = "";
-let startDiff, startDiffMin, hiddenClassStart, startRemarks, finishDiff, finishDiffMin, hiddenClassFinish, finishRemarks, rosterDiff, payableHours;
+let rosterData, shiftData, startDiff, finishDiff, startDiffMin, finishDiffMin, startRemarks, finishRemarks, hiddenClassStart, hiddenClassFinish, rosterDiff, payableHours;
 
 // HTML Templates
-const ONTIME = "<span class='text-success'>on time</span>";
+const ON_TIME = "<span class='text-success'>on time</span>";
 const LATE = "<span class='text-danger'>late</span>";
-const LEFTEARLY = "<span class='text-danger'>left early</span>";
-const NOTIMECLOCKED = "<span class='badge badge-warning'>no time clocked</span>";
+const LEFT_EARLY = "<span class='text-danger'>left early</span>";
+const NO_TIME_CLOCKED = "<span class='badge badge-warning'>no time clocked</span>";
+const NO_DATA = "<span class='badge badge-warning'>no data</span>";
 
 
 // Functions
@@ -18,8 +18,8 @@ function initializeVars(s, r) {
   startDiffMin = (startDiff > 0) ? convMsToMin(startDiff) : 0;
   finishDiffMin = (finishDiff > 0) ? convMsToMin(finishDiff) : 0;
 
-  startRemarks = (startDiff <= 0) ? ONTIME : (startDiff > 0 ? LATE : NOTIMECLOCKED);
-  finishRemarks = (finishDiff <= 0) ? ONTIME : (finishDiff > 0 ? LEFTEARLY : NOTIMECLOCKED);
+  startRemarks = (startDiff <= 0) ? ON_TIME : (startDiff > 0 ? LATE : NO_TIME_CLOCKED);
+  finishRemarks = (finishDiff <= 0) ? ON_TIME : (finishDiff > 0 ? LEFT_EARLY : NO_TIME_CLOCKED);
 
   hiddenClassStart = hiddenClass(startDiffMin);
   hiddenClassFinish = hiddenClass(finishDiffMin);
@@ -32,43 +32,71 @@ function resetRosterDiff() {
 }
 
 function computePayableHours() {
-  payableHours = (rosterDiff) ? (rosterDiff - (startDiffMin/60) - (finishDiffMin/60)) : 0;
+  payableHours = (rosterDiff) ? (rosterDiff - convMinToHr(startDiffMin) - convMinToHr(finishDiffMin)) : 0;
   payableHours = payableHours.toFixed(2);
 }
 
+function th_row(child) {
+  return "<th scope='row'>" + child + "</th>";
+}
+
+function td(child) {
+  return "<td>" + child + "</td>";
+}
+
+function td_muted(child) {
+  return td( "<span class='text-muted'>" + child + "</span>" );
+}
+
+function toolTip(title, child) {
+  return "<span data-toggle='tooltip' data-placement='top' title='" + title + "'>" + child + "</span>"
+}
+
+function badgeDanger(addClass, child) {
+  return " <span class='badge badge-danger" + addClass + "'>" + child + " minutes</span>";
+}
+
 function setTableContents(s, r) {
-  tableContents += "<tr><th scope='row'>" + moment(shiftData[s].date).format("MMMM Do YYYY") + "</th>" +
-    "<td>" + moment.utc(rosterData[r].start).format("h:mma") + "</td>" +
-    "<td><span data-toggle='tooltip' data-placement='top' title='" + moment.utc(shiftData[s].start).format("h:mma") + "'>" + startRemarks + " <span class='badge badge-danger" + hiddenClassStart + "'>" + startDiffMin + " minutes</span></span></td>" +
-    "<td>" + moment.utc(rosterData[r].finish).format("h:mma") + "</td>" +
-    "<td><span data-toggle='tooltip' data-placement='top' title='" + moment.utc(shiftData[s].finish).format("h:mma") + "'>" + finishRemarks + " <span class='badge badge-danger" + hiddenClassFinish + "'>" + finishDiffMin + " minutes</span></span></td>" +
-    "<td>" + payableHours + "</td>" +
+  tableContents += "<tr>" +
+    th_row( moment(shiftData[s].date).format("MMMM Do YYYY") ) +
+    td( moment.utc(rosterData[r].start).format("h:mma") ) +
+    td( toolTip( moment.utc(shiftData[s].start).format("h:mma"), startRemarks + badgeDanger(hiddenClassStart, startDiffMin) )) +
+    td( moment.utc(rosterData[r].finish).format("h:mma") ) +
+    td( toolTip( moment.utc(shiftData[s].finish).format("h:mma"), finishRemarks + badgeDanger(hiddenClassFinish, finishDiffMin) )) +
+    td( payableHours ) +
     "</tr>";
 }
 
 function setTableContentsShift(s, r) {
-  tableContents += "<tr><th scope='row'>" + moment(shiftData[s].date).format("MMMM Do YYYY") + "</th>" +
-    "<td><span class='badge badge-warning'>no data</span></td>" +
-    "<td><span class='text-muted'>" + moment.utc(shiftData[s].start).format("h:mma") + "</span></td>" +
-    "<td><span class='badge badge-warning'>no data</span></td>" +
-    "<td><span class='text-muted'>" + moment.utc(shiftData[s].finish).format("h:mma") + "</span></td>" +
-    "<td>" + payableHours + "</td>" +
+  tableContents += "<tr>" +
+    th_row( moment(shiftData[s].date).format("MMMM Do YYYY") ) +
+    td( NO_DATA ) +
+    td_muted( moment.utc(shiftData[s].start).format("h:mma") ) +
+    td( NO_DATA ) +
+    td_muted( moment.utc(shiftData[s].finish).format("h:mma") ) +
+    td( payableHours ) +
     "</tr>";
 }
 
 function setTableContentsRoster(s, r) {
-  tableContents += "<tr><th scope='row'>" + moment(rosterData[r].date).format("MMMM Do YYYY") + "</th>" +
-    "<td><span class='text-muted'>" + moment.utc(rosterData[r].start).format("h:mma") + "</span></td>" +
-    "<td><span class='badge badge-warning'>no data</span></td>" +
-    "<td><span class='text-muted'>" + moment.utc(rosterData[r].finish).format("h:mma") + "</span></td>" +
-    "<td><span class='badge badge-warning'>no data</span></td>" +
-    "<td>" + payableHours + "</td>" +
+  tableContents += "<tr>" +
+    th_row( moment(rosterData[r].date).format("MMMM Do YYYY") ) +
+    td_muted( moment.utc(rosterData[r].start).format("h:mma") ) +
+    td( NO_DATA ) +
+    td_muted( moment.utc(rosterData[r].finish).format("h:mma") ) +
+    td( NO_DATA ) +
+    td( payableHours ) +
     "</tr>";
 }
 
 function convMsToMin(ms) {
   let min = Math.floor(ms/1000/60);
   return min;
+}
+
+function convMinToHr(min) {
+  let hr = min/60;
+  return hr;
 }
 
 function hiddenClass(a) {
